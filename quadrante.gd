@@ -5,6 +5,8 @@ var lista_de_rastros: Array[Rastro] = []
 var ocupado: bool = false
 var donoAtual: Personagem = null
 
+@onready var game_manager = $".."
+
 signal espalhar
 
 func ocupar(ocupante: Personagem) -> void:
@@ -54,7 +56,7 @@ func adicionar_rastro_com_click():
 	espalhar_rastros()
 
 func _ready() -> void:
-	get_parent().connect("fim_da_acao", Callable(self, "remover_todos_os_rastros"))
+	game_manager.connect("resetar_rastros", Callable(self, "remover_todos_os_rastros"))
 
 func _process(delta: float) -> void:
 	if mouse_esta_em_cima():
@@ -64,9 +66,7 @@ func _process(delta: float) -> void:
 		elif Input.is_action_just_pressed("botaodireito"):
 			if donoAtual:
 				donoAtual.take_damage(5, "oioio", null)
-			print(str("\n")+str(name)+str(":"))
-			for rastro in lista_de_rastros:
-				print(str("Rastro: ")+str(rastro.nome)+str(" Força: ")+str(rastro.forca)+str("\n"))
+			print(str("\nEsta no Limite: ")+ str(estaNoLimite()))
 		
 		modulate = Color(0,0,1,1)
 		$Label.text = ""
@@ -76,8 +76,6 @@ func _process(delta: float) -> void:
 	else:
 		modulate = Color(1,1,1,1)
 		$Label.visible = false
-	
-	reparar()
 
 
 func adicionar_rastro(rastroNovo:Rastro) -> void:
@@ -98,9 +96,14 @@ func adicionar_rastro(rastroNovo:Rastro) -> void:
 	espalhar_rastros()
 
 
-func remover_todos_os_rastros() -> void:
-	if lista_de_rastros.size() > 0:
-		lista_de_rastros.clear()
+func remover_todos_os_rastros(rastrosDeixados: Array[Rastro]) -> void:
+	if lista_de_rastros.size() < 0:
+		return
+	
+	for rastro in rastrosDeixados:
+		for rastropresente in lista_de_rastros:
+			if rastro.nome == rastropresente.nome:
+				lista_de_rastros.erase(rastropresente)
 
 
 func espalhar_rastros()  -> void:
@@ -121,3 +124,13 @@ func espalhar_rastros()  -> void:
 					rastroNovo.decaimento = rastro.decaimento
 					
 					quadrante_proximo.adicionar_rastro(rastroNovo)
+
+func estaNoLimite():
+	print(str("\n\nDistancia até o player: ")+str(global_position.distance_to(game_manager.dono_do_turno.global_position))+str("\nDistancia até do mrastro: ")+str(game_manager.dono_do_turno.disntacia_do_maior_rastro*16))
+	if (
+		global_position.distance_to(game_manager.dono_do_turno.global_position) > 
+		game_manager.dono_do_turno.disntacia_do_maior_rastro*16
+		):
+		return false
+	else:
+		return true

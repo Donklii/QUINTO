@@ -9,9 +9,15 @@ var turnoAtual: bool = false
 var MaxDeAcoes: int = 2
 var movendo: bool = false
 var quadranteAtual: Quadrante = null
+var rastro_mais_longo: Rastro
+var disntacia_do_maior_rastro: int = 0
 
-signal tomou_dano
+@onready var game_manager = $".."
+
 signal causou_dano
+signal tomou_dano
+signal matou
+signal morreu
 
 signal acabou_acao
 signal acabou_turno
@@ -36,13 +42,25 @@ func set_quadrante():
 	quadranteDesejado.ocupar(self)
 	quadranteAtual = quadranteDesejado
 
+func calcularDistanciaDoMaiorRastro() -> void:
+	for rastro in rastrosDeixados:
+		if rastro_mais_longo == null:
+			rastro_mais_longo = rastro
+		if  calcularDistanciaDoRastro(rastro) >  calcularDistanciaDoRastro(rastro_mais_longo):
+			rastro_mais_longo = rastro
+	
+	disntacia_do_maior_rastro = calcularDistanciaDoRastro(rastro_mais_longo)
+
+func calcularDistanciaDoRastro(rastro: Rastro) -> int:
+	return rastro_mais_longo.forca/rastro_mais_longo.decaimento
+
 func _ready() -> void:
-	await get_parent().pronto
+	await game_manager.pronto
 	set_quadrante()
 	set_rastrosDeixados()
 	set_rastrosDesejados()
+	calcularDistanciaDoMaiorRastro()
 	configurarQuadrante()
-	get_parent().connect("fim_da_acao", Callable(self, "configurarQuadrante"))
 
 func detectarInimigos() -> Personagem:
 	for quadrante in $Area2D.get_overlapping_bodies():
@@ -68,6 +86,8 @@ func decidirAcao():
 	
 	if quadrantebusca and not movendo:
 		await mover_ate_quadrante(quadrantebusca)
+		game_manager.resetar_rastros.emit(rastrosDeixados)
+		configurarQuadrante()
 		return
 
 func agir(Acoes: int) -> void:
@@ -76,14 +96,14 @@ func agir(Acoes: int) -> void:
 	await decidirAcao()
 	
 	acabou_acao.emit()
-	get_parent().fim_da_acao.emit()
+	game_manager.fim_da_acao.emit()
 	
 	if Acoes > 1:
 		await Global.create_and_start_timer(1, self)
 		agir(Acoes-1)
 	else:
+		await Global.create_and_start_timer(1, self)
 		acabou_turno.emit()
-		get_parent().fim_do_turno.emit()
 
 
 func mostrarDano(dano: int) -> void:
@@ -118,14 +138,18 @@ func take_damage(dano: int, tipo: String = "", culpa: Personagem = null) -> void
 	
 	if get_meta("Hp") < 1:
 		morrer()
+		if culpa:
+			culpa.matou.emit()
+		
 	tomou_dano.emit()
 
 func morrer():
 	quadranteAtual.desocupar()
 	
-	if self in get_parent().lista_de_acao:
-		get_parent().lista_de_acao.erase(self)
+	if self in game_manager.lista_de_acao:
+		game_manager.lista_de_acao.erase(self)
 	
+	game_manager.resetar_rastros.emit(rastrosDeixados)
 	queue_free()
 
 func causarDano(alvo: Personagem):

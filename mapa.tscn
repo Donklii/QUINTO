@@ -18,6 +18,7 @@ zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 
 [node name="Protagonista" parent="." instance=ExtResource("3_ci34q")]
+position = Vector2(-167, -2)
 
 [node name="Inimigo" parent="." instance=ExtResource("4_rfj0g")]
 position = Vector2(-19, -12)
@@ -27,8 +28,25 @@ follow_viewport_enabled = true
 script = ExtResource("5_bbxn7")
 
 [node name="Label" type="Label" parent="CanvasLayer"]
-offset_left = 73.0
-offset_top = -77.0
-offset_right = 120.0
-offset_bottom = -54.0
+offset_left = 39.0
+offset_top = 9.0
+offset_right = 86.0
+offset_bottom = 32.0
 text = "aaaaa"
+
+[node name="Inimigo2" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-79, 78)
+
+[node name="Inimigo3" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-172, -98)
+
+[node name="Protagonista2" parent="." instance=ExtResource("3_ci34q")]
+position = Vector2(-119, -31)
+
+[node name="Inimigo4" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-53, -119)
+
+[node name="Inimigo5" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-110, -113)
+
+[connection signal="fim_da_acao" from="." to="." method="_on_fim_da_acao"]
