@@ -15,10 +15,9 @@ run/main_scene="res://mapa.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
 config/icon="res://icon.svg"
 
-[display]
+[autoload]
 
-window/stretch/mode="viewport"
-window/stretch/scale_mode="integer"
+Global="*res://Global.gd"
 
 [input]
 

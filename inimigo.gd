@@ -1,29 +1,22 @@
 extends Personagem
-class_name Protagonista
-
+class_name Inimigo
 
 func set_rastrosDeixados():
-	var rastronovo: Rastro = Rastro.new()
-	rastronovo.nome = "stealth"
-	rastronovo.decaimento = 5
-	rastronovo.forca = 50
-	rastrosDeixados.append(rastronovo)
 	var rastronovo2: Rastro = Rastro.new()
-	rastronovo2.nome = "protagonista"
+	rastronovo2.nome = "inimigo"
 	rastronovo2.decaimento = 5
 	rastronovo2.forca = 100
 	rastrosDeixados.append(rastronovo2)
 
 func set_rastrosDesejados():
-	rastrosDesejados = ["viado", "tesouro", "inimigo", "vida"]
-
+	rastrosDesejados = ["protagonista"]
 
 
 func _process(delta: float) -> void:
 	if abs(velocity.x) > 10 or abs(velocity.y) >10:
 		$AnimatedSprite2D.play("default")
 	else:
-		$AnimatedSprite2D.play("Idle")
+		$AnimatedSprite2D.stop()
 
 
 func _on_acabou_acao() -> void:

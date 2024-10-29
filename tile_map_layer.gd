@@ -27,12 +27,15 @@ func adicionar_quadrantes() -> void:
 		tile_count += 1
 
 # Called when the node enters the scene tree for the first time.
+
 func _ready() -> void:
 	await get_tree().process_frame
 	adicionar_quadrantes()
 	print(tile_count)
 	print("Andavel: "+str(andavel_count))
 	print("Não andavel: "+str(nao_andavel_count))
+	await get_tree().process_frame
+	get_parent().pronto.emit()
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta: float) -> void:

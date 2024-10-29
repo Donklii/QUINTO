@@ -1,8 +1,10 @@
-[gd_scene load_steps=4 format=4 uid="uid://6uiyn3lmgpdp"]
+[gd_scene load_steps=6 format=4 uid="uid://6uiyn3lmgpdp"]
 
 [ext_resource type="Script" path="res://mapa.gd" id="1_0llrb"]
 [ext_resource type="PackedScene" uid="uid://cfh71w0xss0qq" path="res://tile_map_layer.tscn" id="1_7x5sd"]
 [ext_resource type="PackedScene" uid="uid://cuxnotubpgl5d" path="res://protagonista.tscn" id="3_ci34q"]
+[ext_resource type="PackedScene" uid="uid://qp1u5wd1ci88" path="res://inimigo.tscn" id="4_rfj0g"]
+[ext_resource type="Script" path="res://canvas_layer.gd" id="5_bbxn7"]
 
 [node name="Mapa" type="Node"]
 script = ExtResource("1_0llrb")
@@ -12,7 +14,21 @@ tile_map_data = PackedByteArray("AAD///7/BgAFAAAAAAD/////BgAIAAoAAAD//wAABgAIAAU
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2(68, 24)
-zoom = Vector2(1.5, 1.5)
+zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 
 [node name="Protagonista" parent="." instance=ExtResource("3_ci34q")]
+
+[node name="Inimigo" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-19, -12)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+follow_viewport_enabled = true
+script = ExtResource("5_bbxn7")
+
+[node name="Label" type="Label" parent="CanvasLayer"]
+offset_left = 73.0
+offset_top = -77.0
+offset_right = 120.0
+offset_bottom = -54.0
+text = "aaaaa"

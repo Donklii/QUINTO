@@ -2,9 +2,18 @@ extends Node2D
 class_name Quadrante
 
 var lista_de_rastros: Array[Rastro] = []
-
+var ocupado: bool = false
+var donoAtual: Personagem = null
 
 signal espalhar
+
+func ocupar(ocupante: Personagem) -> void:
+	ocupado = true
+	donoAtual = ocupante
+
+func desocupar():
+	ocupado = false
+	donoAtual = null
 
 func reparar():
 	for rastroPrimario in lista_de_rastros:
@@ -53,6 +62,8 @@ func _process(delta: float) -> void:
 			adicionar_rastro_com_click()
 		
 		elif Input.is_action_just_pressed("botaodireito"):
+			if donoAtual:
+				donoAtual.take_damage(5, "oioio", null)
 			print(str("\n")+str(name)+str(":"))
 			for rastro in lista_de_rastros:
 				print(str("Rastro: ")+str(rastro.nome)+str(" Força: ")+str(rastro.forca)+str("\n"))
@@ -67,6 +78,7 @@ func _process(delta: float) -> void:
 		$Label.visible = false
 	
 	reparar()
+
 
 func adicionar_rastro(rastroNovo:Rastro) -> void:
 	for rastroatual in lista_de_rastros:
@@ -87,7 +99,8 @@ func adicionar_rastro(rastroNovo:Rastro) -> void:
 
 
 func remover_todos_os_rastros() -> void:
-	lista_de_rastros = []
+	if lista_de_rastros.size() > 0:
+		lista_de_rastros.clear()
 
 
 func espalhar_rastros()  -> void:
