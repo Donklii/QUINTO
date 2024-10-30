@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://qp1u5wd1ci88"]
+[gd_scene load_steps=14 format=3 uid="uid://qp1u5wd1ci88"]
 
 [ext_resource type="Script" path="res://inimigo.gd" id="1_ncaqk"]
 [ext_resource type="Texture2D" uid="uid://66h38kce76sa" path="res://0x72_DungeonTilesetII_v1.7.png" id="2_pumit"]
@@ -70,13 +70,11 @@ animations = [{
 "speed": 5.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_5mybr"]
-size = Vector2(14, 32)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fdepr"]
-size = Vector2(32, 14)
+size = Vector2(22, 22.5)
 
 [node name="Inimigo" type="CharacterBody2D"]
+collision_mask = 0
 script = ExtResource("1_ncaqk")
 metadata/Dano = 1
 metadata/Hp = 3
@@ -93,9 +91,6 @@ frame_progress = 0.268854
 collision_layer = 0
 collision_mask = 16
 monitorable = false
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D"]
-shape = SubResource("RectangleShape2D_5mybr")
 
 [node name="CollisionShape2D2" type="CollisionShape2D" parent="Area2D"]
 shape = SubResource("RectangleShape2D_fdepr")

@@ -12,7 +12,7 @@ var quadranteAtual: Quadrante = null
 var rastro_mais_longo: Rastro
 var disntacia_do_maior_rastro: int = 0
 
-@onready var game_manager = $".."
+@onready var game_manager: Node = $".."
 
 signal causou_dano
 signal tomou_dano
@@ -28,31 +28,8 @@ func set_rastrosDesejados():
 func set_rastrosDeixados():
 	pass
 
-func set_quadrante():
-	var quadranteDesejado: Quadrante
-	for quadrante in $Area2D.get_overlapping_bodies():
-		if quadrante is Quadrante:
-			if not quadrante.ocupado:
-				if not quadranteDesejado:
-					quadranteDesejado = quadrante
-				elif global_position.distance_to(quadranteDesejado.global_position) > global_position.distance_to(quadrante.global_position):
-					quadranteDesejado = quadrante
-	
-	global_position = quadranteDesejado.global_position
-	quadranteDesejado.ocupar(self)
-	quadranteAtual = quadranteDesejado
 
-func calcularDistanciaDoMaiorRastro() -> void:
-	for rastro in rastrosDeixados:
-		if rastro_mais_longo == null:
-			rastro_mais_longo = rastro
-		if  calcularDistanciaDoRastro(rastro) >  calcularDistanciaDoRastro(rastro_mais_longo):
-			rastro_mais_longo = rastro
-	
-	disntacia_do_maior_rastro = calcularDistanciaDoRastro(rastro_mais_longo)
 
-func calcularDistanciaDoRastro(rastro: Rastro) -> int:
-	return rastro_mais_longo.forca/rastro_mais_longo.decaimento
 
 func _ready() -> void:
 	await game_manager.pronto
@@ -62,17 +39,25 @@ func _ready() -> void:
 	calcularDistanciaDoMaiorRastro()
 	configurarQuadrante()
 
-func detectarInimigos() -> Personagem:
-	for quadrante in $Area2D.get_overlapping_bodies():
-		if quadrante is Quadrante:
-			if quadrante.ocupado and quadrante.donoAtual and quadrante != quadranteAtual:
-				if self is Inimigo:
-					if quadrante.donoAtual is Protagonista:
-						return quadrante.donoAtual
-				elif self is Protagonista:
-					if quadrante.donoAtual is Inimigo:
-						return quadrante.donoAtual
-	return null
+## ⎯⎯⎯⎯⎯  𝌅 🌲 ÁRVORE DE DECISÃO 🌲 𝌅  ⎯⎯⎯⎯⎯
+
+
+func agir(Acoes: int) -> void:
+	turnoAtual = true
+	
+	game_manager.comeco_da_acao.emit()
+	
+	await decidirAcao()
+	
+	acabou_acao.emit()
+	game_manager.fim_da_acao.emit()
+	
+	await Global.create_and_start_timer(0.5, self)
+	
+	if Acoes > 1:
+		agir(Acoes-1)
+	else:
+		acabou_turno.emit()
 
 
 func decidirAcao():
@@ -86,24 +71,81 @@ func decidirAcao():
 	
 	if quadrantebusca and not movendo:
 		await mover_ate_quadrante(quadrantebusca)
-		game_manager.resetar_rastros.emit(rastrosDeixados)
+		game_manager.resetar_rastros.emit(self)
 		configurarQuadrante()
 		return
 
-func agir(Acoes: int) -> void:
-	turnoAtual = true
+
+func detectarInimigos() -> Personagem:
+	for i in range(0,4):
+		var quadrante_proximo: Quadrante = quadranteAtual.quadranteAoLado(i)
+		
+		if quadrante_proximo:
+			if quadrante_proximo.ocupado and quadrante_proximo.donoAtual:
+				if self is Inimigo:
+					if quadrante_proximo.donoAtual is Protagonista:
+						return quadrante_proximo.donoAtual
+				elif self is Protagonista:
+					if quadrante_proximo.donoAtual is Inimigo:
+						return quadrante_proximo.donoAtual
+	return null
+
+
+func buscarQuadrante() -> Quadrante:
+	var forca: int = 0
 	
-	await decidirAcao()
+	for rastro in quadranteAtual.lista_de_rastros:
+		for rastro_desejado in rastrosDesejados:
+			if rastro.nome.begins_with(rastro_desejado) and rastro.forca > forca:
+				forca = rastro.forca
 	
-	acabou_acao.emit()
-	game_manager.fim_da_acao.emit()
+	var quadranteDesejado: Quadrante = null
 	
-	if Acoes > 1:
-		await Global.create_and_start_timer(1, self)
-		agir(Acoes-1)
-	else:
-		await Global.create_and_start_timer(1, self)
-		acabou_turno.emit()
+	for i in range(0,4):
+		var quadrante_proximo: Quadrante = quadranteAtual.quadranteAoLado(i)
+		
+		if quadrante_proximo:
+			if not quadrante_proximo.ocupado:
+				for rastro in quadrante_proximo.lista_de_rastros:
+					for rastro_desejado in rastrosDesejados:
+						if rastro.nome.begins_with(rastro_desejado) and rastro.forca > forca:
+							quadranteDesejado = quadrante_proximo
+							forca = rastro.forca
+	
+	return quadranteDesejado
+
+
+##⇀ ⇀ ⇀ ⇀ ⇀ ➤ M O V I M E N T A Ç Ã O ➤ ⇀ ⇀ ⇀ ⇀ ⇀
+
+func mover(alvo: Vector2, velocidade: int, proximidade: float = 4):
+	
+	while (alvo.distance_to(global_position) > proximidade):
+		var direction = (alvo - global_position).normalized()
+		
+		velocity = direction * velocidade
+		
+		move_and_slide()
+		await get_tree().process_frame
+
+
+
+func mover_ate_quadrante(quadrantebusca: Quadrante) -> void:
+	movendo = true
+	quadranteAtual.desocupar()
+	quadrantebusca.modulate = Color(0,1,0)
+	
+	await mover(quadrantebusca.global_position, 30)
+	
+	velocity = Vector2(0,0)
+	global_position = quadrantebusca.global_position
+	movendo = false
+	
+	quadrantebusca.ocupar(self)
+	quadrantebusca.modulate = Color(1,1,1)
+	quadranteAtual = quadrantebusca
+
+
+##✹✹✹✹✹✹✹✹✹✹✹✹✹  C ⊛ M B A T E ✹✹✹✹✹✹✹✹✹✹✹✹✹
 
 
 func mostrarDano(dano: int) -> void:
@@ -149,89 +191,61 @@ func morrer():
 	if self in game_manager.lista_de_acao:
 		game_manager.lista_de_acao.erase(self)
 	
-	game_manager.resetar_rastros.emit(rastrosDeixados)
+	game_manager.resetar_rastros.emit(self)
+	await get_tree().process_frame
 	queue_free()
 
 func causarDano(alvo: Personagem):
-	#movendo = true
+	var quadrante_do_alvo: Quadrante = alvo.quadranteAtual
+	quadrante_do_alvo.modulate = Color(1,0.2,0)
 	
-	#while global_position.distance_to(alvo.global_position) < 40:
-	#	print("1")
-	#	var direction = (alvo.global_position - global_position).normalized()
-	#	velocity = direction * 40
-	#	move_and_slide()
-	#	await get_tree().process_frame
-	
-	#while global_position.distance_to(alvo.global_position) > 5:
-	#	print("2")
-	#	var direction = (global_position -alvo.global_position ).normalized()
-	#	velocity = direction * 80
-	#	move_and_slide()
-	#	await get_tree().process_frame
+	await mover(alvo.global_position, 40)
 	
 	alvo.take_damage(get_meta("Dano"))
 	causou_dano.emit()
 	
 	
-	#while quadranteAtual.global_position.distance_to(global_position) > 3:
-	#	print("3")
-	#	var direction = (quadranteAtual.global_position - position).normalized()
-	#	velocity = direction * 50
-	#	
-	#	move_and_slide()
-	#	await get_tree().process_frame
-	
-	#movendo = false
-	#velocity = Vector2(0,0)
-	#global_position = quadranteAtual.global_position
-
-
-func buscarQuadrante() -> Quadrante:
-	var forca: int = 0
-	
-	for rastro in quadranteAtual.lista_de_rastros:
-		if rastro.nome in rastrosDesejados and rastro.forca > forca:
-			forca = rastro.forca
-	
-	var quadranteDesejado: Quadrante = null
-	
-	for quadrante in $Area2D.get_overlapping_bodies():
-		if quadrante is Quadrante:
-			if not quadrante.ocupado:
-				
-				for rastro in quadrante.lista_de_rastros:
-					if rastro.nome in rastrosDesejados:
-						if rastro.forca > forca:
-							quadranteDesejado = quadrante
-							forca = rastro.forca
-	
-	return quadranteDesejado
-
-
-func mover_ate_quadrante(quadrantebusca: Quadrante) -> void:
-	movendo = true
-	quadranteAtual.desocupar()
-	
-	while quadrantebusca.global_position.distance_to(global_position) > 3:
-		var direction = (quadrantebusca.global_position - position).normalized()
-		velocity = direction * 50
-		
-		move_and_slide()
-		await get_tree().process_frame
+	await mover(quadranteAtual.global_position, 15,2)
 	
 	velocity = Vector2(0,0)
-	global_position = quadrantebusca.global_position
-	movendo = false
-	
-	quadrantebusca.ocupar(self)
-	quadranteAtual = quadrantebusca
+	global_position = quadranteAtual.global_position
+	quadrante_do_alvo.modulate = Color(1,1,1)
+
+
+##✧✧✧  𝕌𝕋𝕀𝕃𝕊 ✧✧✧
 
 
 func configurarQuadrante():
 	await get_tree().process_frame
 	for rastro in rastrosDeixados:
 		var rastronovo: Rastro = Rastro.new()
-		rastronovo.nome = rastro.nome
-		rastronovo.decaimento = rastro.decaimento
-		rastronovo.forca = rastro.forca
+		rastronovo.copiar(rastro)
+		
 		quadranteAtual.adicionar_rastro(rastronovo)
+
+func calcularDistanciaDoMaiorRastro() -> void:
+	for rastro in rastrosDeixados:
+		if rastro_mais_longo == null:
+			rastro_mais_longo = rastro
+		if  calcularDistanciaDoRastro(rastro) >  calcularDistanciaDoRastro(rastro_mais_longo):
+			rastro_mais_longo = rastro
+	
+	disntacia_do_maior_rastro = calcularDistanciaDoRastro(rastro_mais_longo)
+
+func calcularDistanciaDoRastro(rastro: Rastro) -> int:
+	return rastro.forca/rastro.decaimento
+
+func set_quadrante():
+	var quadranteDesejado: Quadrante = null
+	for quadrante in $Area2D.get_overlapping_bodies():
+		if quadrante is Quadrante:
+			if not quadrante.ocupado:
+				if not quadranteDesejado:
+					quadranteDesejado = quadrante
+				elif global_position.distance_to(quadranteDesejado.global_position) > global_position.distance_to(quadrante.global_position):
+					quadranteDesejado = quadrante
+	
+	global_position = quadranteDesejado.global_position
+	quadranteDesejado.ocupar(self)
+	quadranteAtual = quadranteDesejado
+	$Area2D.queue_free()

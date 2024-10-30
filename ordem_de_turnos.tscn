@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://dnilxhwjdn07b"]
+
+[ext_resource type="Script" path="res://ordem_de_turnos.gd" id="1_ekd7y"]
+
+[node name="Ordem de turnos" type="CanvasLayer"]
+script = ExtResource("1_ekd7y")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = 34.0
+offset_top = 63.0
+offset_right = 207.0
+offset_bottom = 394.0
+
+[node name="Imagens" type="Node2D" parent="."]
+position = Vector2(110, 79)

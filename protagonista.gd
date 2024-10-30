@@ -7,11 +7,14 @@ func set_rastrosDeixados():
 	rastronovo.nome = "stealth"
 	rastronovo.decaimento = 5
 	rastronovo.forca = 50
+	rastronovo.emissor = self
 	rastrosDeixados.append(rastronovo)
+	
 	var rastronovo2: Rastro = Rastro.new()
 	rastronovo2.nome = "protagonista"
 	rastronovo2.decaimento = 5
 	rastronovo2.forca = 100
+	rastronovo2.emissor = self
 	rastrosDeixados.append(rastronovo2)
 
 func set_rastrosDesejados():
@@ -19,7 +22,7 @@ func set_rastrosDesejados():
 
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	if abs(velocity.x) > 10 or abs(velocity.y) >10:
 		$AnimatedSprite2D.play("default")
 	else:

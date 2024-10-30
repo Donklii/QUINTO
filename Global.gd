@@ -20,7 +20,3 @@ func create_and_start_timer(duration, dono):
 	await timer.timeout
 	timer.queue_free()
 	return
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
