@@ -92,5 +92,3 @@ func _on_comeco_do_turno() -> void:
 func _on_morte(personagem: Personagem) -> void:
 	if personagem in lista_de_acao:
 		lista_de_acao.erase(personagem)
-	
-	personagem.quadranteAtual.desocupar()

@@ -33,10 +33,13 @@ func set_rastrosDeixados() -> void:
 
 func _ready() -> void:
 	await game_manager.pronto
-	set_quadrante()
 	set_rastrosDeixados()
 	set_rastrosDesejados()
+	
 	calcularDistanciaDoMaiorRastro()
+	
+	set_quadrante()
+
 
 ## ⎯⎯⎯⎯⎯  𝌅 🌲 ÁRVORE DE DECISÃO 🌲 𝌅  ⎯⎯⎯⎯⎯
 
@@ -193,6 +196,8 @@ func take_damage(dano: int, tipo: String = "", culpa: Personagem = null) -> void
 func morrer() -> void:
 	game_manager.morte.emit(self)
 	
+	quadranteAtual.desocupar()
+	
 	await get_tree().process_frame
 	
 	queue_free()
@@ -218,12 +223,13 @@ func causarDano(alvo: Personagem) -> void:
 
 
 func configurarQuadrante() -> void:
-	await get_tree().process_frame
 	for rastro in rastrosDeixados:
 		var rastronovo: Rastro = Rastro.new()
 		rastronovo.copiar(rastro)
 		
 		quadranteAtual.adicionar_rastro(rastronovo)
+		await get_tree().process_frame # -lag
+
 
 func calcularDistanciaDoMaiorRastro() -> void:
 	for rastro in rastrosDeixados:
@@ -246,5 +252,5 @@ func set_quadrante() -> void:
 					quadranteDesejado = quadrante
 	
 	global_position = quadranteDesejado.global_position
-	await quadranteDesejado.ocupar(self)
+	quadranteDesejado.ocupar(self)
 	$Area2D.queue_free()

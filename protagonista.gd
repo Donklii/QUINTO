@@ -19,7 +19,7 @@ func set_rastrosDeixados():
 	rastrosDeixados.append(rastronovo2)
 
 func set_rastrosDesejados() -> void:
-	rastrosDesejados = ["viado", "tesouro", "inimigo", "vida"]
+	rastrosDesejados = ["test", "tesouro", "inimigo", "vida"]
 
 
 
