@@ -1,16 +1,17 @@
 extends Personagem
 class_name Inimigo
 
-func set_rastrosDeixados():
-	var rastronovo2: Rastro = Rastro.new()
-	rastronovo2.nome = "inimigo"
-	rastronovo2.decaimento = 5
-	rastronovo2.forca = 100
-	rastronovo2.emissor = self
+func set_rastrosDeixados() -> void:
+	var rastronovo: Rastro = Rastro.new()
+	rastronovo.nome = "inimigo"
+	rastronovo.decaimento = 5
+	rastronovo.forca = 100
+	rastronovo.emissor = self
+	rastronovo.passa_por_personagem = false
 	
-	rastrosDeixados.append(rastronovo2)
+	rastrosDeixados.append(rastronovo)
 
-func set_rastrosDesejados():
+func set_rastrosDesejados() -> void:
 	rastrosDesejados = ["protagonista"]
 
 

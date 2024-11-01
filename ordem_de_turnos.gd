@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 @onready var mapa: Node = $".."
+const DISTANCIA_ENTRE_IMAGENS: int = 30
 
 func ordenar_lista_de_turnos():
 	for child in $Imagens.get_children():
@@ -13,6 +14,7 @@ func ordenar_lista_de_turnos():
 		var indice = (turno_atual_index + i) % mapa.lista_de_acao.size()
 		lista_ordenada.append(mapa.lista_de_acao[indice])
 	
+	$ColorRect.size.y = lista_ordenada.size()*DISTANCIA_ENTRE_IMAGENS + 30
 	
 	var posicao_y: int = 0
 	for personagem in lista_ordenada:
@@ -21,13 +23,14 @@ func ordenar_lista_de_turnos():
 		imagemnova.frame = 0
 		imagemnova.position.y = posicao_y
 		$Imagens.add_child(imagemnova)
-		posicao_y += 30
+		posicao_y += DISTANCIA_ENTRE_IMAGENS
 		
 		if personagem == lista_ordenada[-1]:
 			imagemnova.modulate.a = 0
 			imagemnova.position.x -= 150
 			
 			for i in range(80):
+				if not is_instance_valid(imagemnova): return
 				imagemnova.position.x += 1.875
 				imagemnova.modulate.a += 0.0125
 				await get_tree().process_frame

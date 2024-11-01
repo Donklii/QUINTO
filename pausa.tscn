@@ -1,0 +1,24 @@
+[gd_scene load_steps=2 format=3 uid="uid://dth7grsnwbb6e"]
+
+[ext_resource type="Script" path="res://Pausa.gd" id="1_h62f1"]
+
+[node name="Pausa" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_h62f1")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 941.0
+offset_top = 483.0
+offset_right = 1106.0
+offset_bottom = 538.0
+theme_override_font_sizes/font_size = 40
+text = "Pausado"
+
+[node name="Label2" type="Label" parent="."]
+offset_left = 947.0
+offset_top = 564.0
+offset_right = 1112.0
+offset_bottom = 619.0
+theme_override_font_sizes/font_size = 40
+text = "X
+"

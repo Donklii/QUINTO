@@ -18,12 +18,14 @@ animations = [{
 size = Vector2(16, 16)
 
 [node name="Quadrante" type="CharacterBody2D"]
+process_mode = 3
 collision_layer = 16
 collision_mask = 0
 input_pickable = true
 script = ExtResource("1_qhall")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+modulate = Color(1, 1, 1, 0.247059)
 sprite_frames = SubResource("SpriteFrames_4fyf3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -37,6 +39,35 @@ offset_right = 46.0
 offset_bottom = -26.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 
-[connection signal="espalhar" from="." to="." method="espalhar_rastros"]
+[node name="Node2D" type="Node2D" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="Node2D"]
+offset_left = -7.0
+offset_top = -8.0
+offset_right = 7.0
+offset_bottom = -7.0
+color = Color(0, 0, 0, 0.117647)
+
+[node name="ColorRect2" type="ColorRect" parent="Node2D"]
+offset_left = -7.0
+offset_top = 7.0
+offset_right = 7.0
+offset_bottom = 8.0
+color = Color(0, 0, 0, 0.117647)
+
+[node name="ColorRect3" type="ColorRect" parent="Node2D"]
+offset_left = 7.0
+offset_top = -8.0
+offset_right = 8.0
+offset_bottom = 8.0
+color = Color(0, 0, 0, 0.117647)
+
+[node name="ColorRect4" type="ColorRect" parent="Node2D"]
+offset_left = -8.0
+offset_top = -8.0
+offset_right = -7.0
+offset_bottom = 8.0
+color = Color(0, 0, 0, 0.117647)
+
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

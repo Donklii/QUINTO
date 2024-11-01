@@ -2276,25 +2276,13 @@ zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 
 [node name="Protagonista" parent="." instance=ExtResource("3_ci34q")]
-position = Vector2(-29, -33)
+position = Vector2(-29, -49)
 
 [node name="Inimigo" parent="." instance=ExtResource("4_rfj0g")]
-position = Vector2(-19, -12)
+position = Vector2(-51, -13)
 
 [node name="Inimigo2" parent="." instance=ExtResource("4_rfj0g")]
 position = Vector2(-79, 78)
-
-[node name="Inimigo3" parent="." instance=ExtResource("4_rfj0g")]
-position = Vector2(-172, -32)
-
-[node name="Protagonista2" parent="." instance=ExtResource("3_ci34q")]
-position = Vector2(-107, 53)
-
-[node name="Inimigo4" parent="." instance=ExtResource("4_rfj0g")]
-position = Vector2(-110, -11)
-
-[node name="Inimigo5" parent="." instance=ExtResource("4_rfj0g")]
-position = Vector2(-238, -24)
 
 [node name="Ordem de turnos" parent="." instance=ExtResource("5_xvwyh")]
 
@@ -2309,7 +2297,15 @@ offset_right = 86.0
 offset_bottom = 32.0
 text = "aaaaa"
 
+[node name="Inimigo3" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-29, -12)
+
+[node name="Inimigo4" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-7, 24)
+
 [connection signal="comeco_da_acao" from="." to="." method="_on_comeco_da_acao"]
+[connection signal="comeco_do_turno" from="." to="." method="_on_comeco_do_turno"]
 [connection signal="comeco_do_turno" from="." to="Ordem de turnos" method="ordenar_lista_de_turnos"]
 [connection signal="fim_da_acao" from="." to="." method="_on_fim_da_acao"]
 [connection signal="fim_do_turno" from="." to="Ordem de turnos" method="fim_do_turno"]
+[connection signal="morte" from="." to="." method="_on_morte"]

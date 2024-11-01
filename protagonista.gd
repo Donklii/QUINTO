@@ -15,9 +15,10 @@ func set_rastrosDeixados():
 	rastronovo2.decaimento = 5
 	rastronovo2.forca = 100
 	rastronovo2.emissor = self
+	rastronovo2.passa_por_personagem = false
 	rastrosDeixados.append(rastronovo2)
 
-func set_rastrosDesejados():
+func set_rastrosDesejados() -> void:
 	rastrosDesejados = ["viado", "tesouro", "inimigo", "vida"]
 
 
