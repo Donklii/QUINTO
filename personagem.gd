@@ -10,7 +10,7 @@ var MaxDeAcoes: int = 2
 var movendo: bool = false
 var quadranteAtual: Quadrante = null
 var rastro_mais_longo: Rastro
-var disntacia_do_maior_rastro: int = 0
+var distancia_do_maior_rastro: int = 0
 
 @onready var game_manager: Node = $".."
 
@@ -229,13 +229,10 @@ func calcularDistanciaDoMaiorRastro() -> void:
 	for rastro in rastrosDeixados:
 		if rastro_mais_longo == null:
 			rastro_mais_longo = rastro
-		if  calcularDistanciaDoRastro(rastro) >  calcularDistanciaDoRastro(rastro_mais_longo):
+		if  rastro.calcularDistanciaDoRastro() >  rastro_mais_longo.calcularDistanciaDoRastro():
 			rastro_mais_longo = rastro
 	
-	disntacia_do_maior_rastro = calcularDistanciaDoRastro(rastro_mais_longo)
-
-func calcularDistanciaDoRastro(rastro: Rastro) -> int:
-	return rastro.forca/rastro.decaimento
+	distancia_do_maior_rastro = rastro_mais_longo.calcularDistanciaDoRastro()
 
 
 func set_quadrante() -> void:

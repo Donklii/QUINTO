@@ -18,32 +18,62 @@ func ocupar(ocupante: Personagem) -> void:
 	ocupado = true
 	
 	if ocupante.quadranteAtual:
-		ocupante.quadranteAtual.desocupar()
+		await ocupante.quadranteAtual.desocupar()
 	
 	donoAtual = ocupante
 	donoAtual.quadranteAtual = self
 	
-	var lista: Array[Personagem] = []
 	for rastro in lista_de_rastros:
 		if not rastro.passa_por_personagem and rastro.emissor != ocupante:
-			if not rastro.emissor in lista:
-				lista.append(rastro.emissor)
-	
-	for personagem in lista:
-		game_manager.resetar_rastros.emit(personagem)
-		await get_tree().process_frame
-		personagem.configurarQuadrante()
+			var salvo: Personagem = rastro.emissor
+			
+			var rastroNovo: Rastro = Rastro.new()
+			rastroNovo.copiar(rastro)
+			rastroNovo.forca += rastroNovo.decaimento
+			apagar_restos_de_rastro(rastroNovo)
+			
+			apagar_rastro(rastro)
+			rastroNovo.queue_free()
+			
+			salvo.configurarQuadrante()
 	
 	donoAtual.configurarQuadrante()
 
+func apagar_restos_de_rastro(rastro: Rastro):
+	var rastroDecendente: Rastro = tem_residuos_do_rastro(rastro)
+	
+	if !rastroDecendente:
+		return
+	
+	if not (rastroDecendente.forca - rastroDecendente.decaimento > 0):
+		apagar_rastro(rastroDecendente)
+		return
+	
+	for i in range(0,4):
+		var quadrante_desejado: Quadrante = quadranteAoLado(i)
+		
+		if quadrante_desejado:
+			
+			if quadrante_desejado.tem_residuos_do_rastro(rastro):
+				quadrante_desejado.apagar_restos_de_rastro(rastroDecendente)
+	
+	apagar_rastro(rastroDecendente)
 
 func desocupar() -> void:
 	ocupado = false
+	
+	for rastroDeixado in donoAtual.rastrosDeixados:
+		var rastro: Rastro = Rastro.new()
+		rastro.copiar(rastroDeixado)
+		rastro.forca += rastro.decaimento
+		await apagar_restos_de_rastro(rastro)
+	
 	donoAtual = null
 
 
 func _ready() -> void:
-	game_manager.connect("resetar_rastros", Callable(self, "remover_rastros"))
+	game_manager.connect("apagar_rastro", Callable(self, "remover_rastro"))
+	game_manager.connect("resetar_rastros", Callable(self, "remover_rastros_por_emissor"))
 
 
 ##➳➳➳ 𝐹𝑈𝑁𝐶̧𝑂̃𝐸𝑆 𝐵𝐴𝑆𝐸 ➳➳➳
@@ -76,17 +106,36 @@ func adicionar_rastro(rastroNovo:Rastro) -> void:
 	espalhar_rastros()
 
 
-func remover_rastros(emissor: Personagem) -> void:
+func remover_rastros_por_emissor(emissor: Personagem) -> void:
 	
-	for rastropresente in lista_de_rastros:
+	if lista_de_rastros.size() < 1:
+		return
+	
+	
+	for rastroPresente in lista_de_rastros:
 		
-		if rastropresente.emissor == emissor:
-			lista_de_rastros.erase(rastropresente)
-			rastropresente.queue_free()
+		if rastroPresente.emissor == emissor:
+			apagar_rastro(rastroPresente)
+
+
+func remover_rastro(rastro: Rastro):
+	var rastroPresente: Rastro = tem_rastro(rastro)
+	
+	if rastroPresente:
+		apagar_rastro(rastroPresente)
 
 
 func remover_todos_os_rastros():
-	lista_de_rastros.clear()
+	for rastro in lista_de_rastros:
+		lista_de_rastros.erase(rastro)
+		rastro.queue_free()
+
+
+func apagar_rastro(rastro: Rastro):
+	lista_de_rastros.erase(rastro)
+	rastro.queue_free()
+
+
 
 
 func espalhar_rastros()  -> void:
@@ -130,6 +179,21 @@ func quadranteAoLado(indice: int) -> Quadrante:
 
 
 ##✧✧✧  𝕌𝕋𝕀𝕃𝕊 ✧✧✧
+
+func tem_rastro(rastro: Rastro) -> Rastro:
+	for rastroAtual in lista_de_rastros:
+		if rastroAtual.nome == rastro.nome and rastroAtual.emissor == rastro.emissor:
+			return rastroAtual
+	
+	return null
+
+func tem_residuos_do_rastro(rastro: Rastro) -> Rastro:
+	for rastroAtual in lista_de_rastros:
+		if rastro.nome == rastroAtual.nome and rastro.emissor == rastroAtual.emissor:
+			if rastro.forca > rastroAtual.forca:
+				return rastroAtual
+	
+	return null
 
 
 func estaNoLimite():
@@ -185,8 +249,8 @@ func adicionar_rastro_com_click()  -> void:
 	espalhar_rastros()
 
 
-func calcularDistanciaDoAtual() -> int:
-	var quadranteAlmejado: Quadrante =  game_manager.dono_do_turno.quadranteAtual
+func calcularDistanciaDoAlvo(alvo: Personagem = game_manager.dono_do_turno) -> int:
+	var quadranteAlmejado: Quadrante =  alvo.quadranteAtual
 	
 	var distancia: int = abs(global_position.x - quadranteAlmejado.global_position.x)
 	distancia += abs(global_position.y - quadranteAlmejado.global_position.y)

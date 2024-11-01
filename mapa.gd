@@ -16,6 +16,7 @@ signal fim_do_turno
 
 signal morte
 signal resetar_rastros
+signal apagar_rastro
 
 # Called when the node enters the scene tree for the first time.
 
@@ -78,8 +79,8 @@ func _on_comeco_da_acao() -> void:
 func fade_dos_quadrantes():
 	for filho in get_children():
 		if filho is Quadrante:
-			if filho.calcularDistanciaDoAtual() > 10:
-				var cor: float = exp(-0.3 * filho.calcularDistanciaDoAtual())
+			if filho.calcularDistanciaDoAlvo() > 10:
+				var cor: float = exp(-0.3 * filho.calcularDistanciaDoAlvo())
 				filho.mudarTransparencia(cor)
 			else:
 				filho.mudarTransparencia(0.25)
@@ -91,7 +92,5 @@ func _on_comeco_do_turno() -> void:
 func _on_morte(personagem: Personagem) -> void:
 	if personagem in lista_de_acao:
 		lista_de_acao.erase(personagem)
-	
-	resetar_rastros.emit(personagem)
 	
 	personagem.quadranteAtual.desocupar()

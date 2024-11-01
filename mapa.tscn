@@ -2303,6 +2303,18 @@ position = Vector2(-29, -12)
 [node name="Inimigo4" parent="." instance=ExtResource("4_rfj0g")]
 position = Vector2(-7, 24)
 
+[node name="Protagonista2" parent="." instance=ExtResource("3_ci34q")]
+position = Vector2(-132, 73)
+
+[node name="Inimigo5" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-248, -7)
+
+[node name="Inimigo6" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-203, -99)
+
+[node name="Protagonista3" parent="." instance=ExtResource("3_ci34q")]
+position = Vector2(-177, -85)
+
 [connection signal="comeco_da_acao" from="." to="." method="_on_comeco_da_acao"]
 [connection signal="comeco_do_turno" from="." to="." method="_on_comeco_do_turno"]
 [connection signal="comeco_do_turno" from="." to="Ordem de turnos" method="ordenar_lista_de_turnos"]

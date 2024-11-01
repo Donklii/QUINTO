@@ -5,6 +5,7 @@ var nome: String
 var forca:int
 var decaimento: int
 var passa_por_personagem: bool = true
+var distancia_do_rastro: int
 var emissor: Personagem
 
 func equals(rastro:Rastro) -> bool:
@@ -20,3 +21,7 @@ func copiar(rastro: Rastro):
 	decaimento = rastro.decaimento
 	emissor = rastro.emissor
 	passa_por_personagem = rastro.passa_por_personagem
+
+func calcularDistanciaDoRastro() -> int:
+	distancia_do_rastro = forca/decaimento
+	return forca/decaimento
