@@ -5,7 +5,7 @@ var nome: String
 var forca:int
 var decaimento: int
 var passa_por_personagem: bool = true
-var emissor: Personagem
+var emissor: Entidade
 
 func equals(rastro:Rastro) -> bool:
 	return (nome == rastro.nome and

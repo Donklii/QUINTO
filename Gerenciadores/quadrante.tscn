@@ -1,7 +1,7 @@
 [gd_scene load_steps=5 format=3 uid="uid://bs754w0rxw8n0"]
 
-[ext_resource type="Script" path="res://quadrante.gd" id="1_qhall"]
-[ext_resource type="Texture2D" uid="uid://b2qq4itacj3hp" path="res://pixil-frame-0 (17).png" id="1_te8ej"]
+[ext_resource type="Script" path="res://Gerenciadores/quadrante.gd" id="1_qhall"]
+[ext_resource type="Texture2D" uid="uid://b2qq4itacj3hp" path="res://Imagens/pixil-frame-0 (17).png" id="1_te8ej"]
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_4fyf3"]
 animations = [{

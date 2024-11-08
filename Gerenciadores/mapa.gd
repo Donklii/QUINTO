@@ -3,8 +3,12 @@ extends Node
 var protagonista: Protagonista
 var lista_de_acao: Array[Personagem] = []
 var dono_do_turno: Personagem
-@onready var tile_map_layer: TileMapLayer = $TileMapLayer
 
+var cameraMov: Vector2 = Vector2(0,0)
+var cameraPos: Vector2
+var quadrante_matrix: Array[Array] = []
+
+@onready var tile_map_layer: TileMapLayer = $TileMapLayer
 
 signal pronto
 
@@ -24,17 +28,29 @@ func _ready() -> void:
 	protagonista = get_node("Protagonista")
 	await pronto
 	await get_tree().process_frame
-	adicionarListaDeAcoes()
+	await adicionarListaDeAcoes()
 	gerenciarAcoes()
 
 func adicionarListaDeAcoes() -> void:
+	await get_tree().process_frame
 	for filho in get_children():
-		if filho is Personagem:
-			lista_de_acao.append(filho)
+		if filho is Personagem and not filho in lista_de_acao and is_instance_valid(filho):
+			if not filho.quadranteAtual or filho.get_meta("Hp") < 1:
+				await get_tree().process_frame
+				adicionarListaDeAcoes()
+			elif (filho.quadranteAtual.setor == protagonista.quadranteAtual.setor or
+			filho.ativo or
+			filho.quadranteAtual.setor in protagonista.quadranteAtual.setoresAdjacentes
+			):
+				lista_de_acao.append(filho)
+				filho.ativo = true
 
 func gerenciarAcoes() -> void:
 	for personagem in lista_de_acao:
 		dono_do_turno = personagem
+		
+		if not esta_movendo_a_camera():
+			cameraMov = Vector2(0,0)
 		
 		print(str("turno de ") + str(personagem.name))
 		comeco_do_turno.emit()
@@ -52,29 +68,27 @@ func gerenciarAcoes() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(_delta: float) -> void:
-	if dono_do_turno and is_instance_valid(dono_do_turno):
-		$Camera2D.global_position = dono_do_turno.global_position
+	if not esta_movendo_a_camera():
+		if dono_do_turno and is_instance_valid(dono_do_turno):
+			$Camera2D.global_position = dono_do_turno.global_position + cameraMov
+			cameraPos = $Camera2D.global_position - cameraMov
+		else:
+			dono_do_turno = null
 	else:
-		dono_do_turno = null
-
-
-
-func desativarQuadrantesLonges() -> void:
-	for filho in get_children():
-		if filho is Quadrante:
-			if filho.estaNoLimite():
-				filho.process_mode = Node.PROCESS_MODE_INHERIT
-			else:
-				filho.process_mode = Node.PROCESS_MODE_DISABLED
-
+		$Camera2D.global_position = cameraPos + cameraMov
 
 func _on_fim_da_acao() -> void:
-	pass # Replace with function body.
+	adicionarListaDeAcoes()
 
 
 func _on_comeco_da_acao() -> void:
 	fade_dos_quadrantes()
 
+func esta_movendo_a_camera() -> bool:
+	return (Input.is_action_pressed("A") or
+	Input.is_action_pressed("D") or 
+	Input.is_action_pressed("W") or
+	Input.is_action_pressed("S"))
 
 func fade_dos_quadrantes():
 	for filho in get_children():

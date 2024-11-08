@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://dnilxhwjdn07b"]
 
-[ext_resource type="Script" path="res://ordem_de_turnos.gd" id="1_ekd7y"]
+[ext_resource type="Script" path="res://Gerenciadores/ordem_de_turnos.gd" id="1_ekd7y"]
 
 [node name="Ordem de turnos" type="CanvasLayer"]
 script = ExtResource("1_ekd7y")

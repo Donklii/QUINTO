@@ -1,19 +1,15 @@
-extends CharacterBody2D
+extends Entidade
 class_name Personagem
 
 
-var rastrosDeixados: Array[Rastro] = []
 var rastrosDesejados: Array[String] = []
 
 var turnoAtual: bool = false
 var MaxDeAcoes: int = 2
-var movendo: bool = false
-var quadranteAtual: Quadrante = null
-var rastro_mais_longo: Rastro
-var distancia_do_maior_rastro: int = 0
+var ativo: bool = false
+var pronto_para_fim_da_acao: bool = true
 
-@onready var game_manager: Node = $".."
-
+signal recuperou_vida
 signal causou_dano
 signal tomou_dano
 signal matou
@@ -22,17 +18,12 @@ signal morreu
 signal acabou_acao
 signal acabou_turno
 
-
 func set_rastrosDesejados() -> void:
 	pass
-func set_rastrosDeixados() -> void:
-	pass
-
-
-
 
 func _ready() -> void:
 	await game_manager.pronto
+	
 	set_rastrosDeixados()
 	set_rastrosDesejados()
 	
@@ -51,13 +42,19 @@ func agir(Acoes: int) -> void:
 	
 	await decidirAcao()
 	
+	while not pronto_para_fim_da_acao:
+		await get_tree().process_frame
+	
 	acabou_acao.emit()
 	game_manager.fim_da_acao.emit()
 	
 	await Global.create_and_start_timer(0.5, self)
 	
+	
 	if Acoes > 1:
 		agir(Acoes-1)
+	elif game_manager.lista_de_acao.size() < 2:
+		agir(MaxDeAcoes)
 	else:
 		finalizarTurno()
 
@@ -75,7 +72,7 @@ func decidirAcao() -> void:
 	
 	var quadrantebusca: Quadrante = buscarQuadrante()
 	
-	if quadrantebusca and not movendo:
+	if quadrantebusca:
 		await mover_ate_quadrante(quadrantebusca)
 		return
 
@@ -121,8 +118,6 @@ func buscarQuadrante() -> Quadrante:
 
 func mover(alvo: Vector2, velocidade: int, proximidade: float = 4) -> void:
 	
-	movendo = true
-	
 	while (alvo.distance_to(global_position) > proximidade):
 		var direction = (alvo - global_position).normalized()
 		
@@ -132,7 +127,6 @@ func mover(alvo: Vector2, velocidade: int, proximidade: float = 4) -> void:
 		await get_tree().process_frame
 	
 	velocity = Vector2(0,0)
-	movendo = false
 
 
 
@@ -155,14 +149,11 @@ func mover_ate_quadrante(quadrantebusca: Quadrante) -> void:
 
 ##✹✹✹✹✹✹✹✹✹✹✹✹✹  C ⊛ M B A T E ✹✹✹✹✹✹✹✹✹✹✹✹✹
 
-
-func mostrarDano(dano: int) -> void:
+func numeroFlutuante(cor: Color, mensagem: String = "") -> void:
 	var numeroFlutuante = Label.new()
-	numeroFlutuante.text = str(dano)
+	numeroFlutuante.text = mensagem
 	
-	
-	var cor: int = 255-(dano*15)
-	numeroFlutuante.self_modulate = Color(255,cor,0)
+	numeroFlutuante.self_modulate = cor
 	
 	add_child(numeroFlutuante)
 	numeroFlutuante.global_position = get_node("AnimatedSprite2D").global_position + Vector2(0,-20)
@@ -180,18 +171,34 @@ func mostrarDano(dano: int) -> void:
 	numeroFlutuante.queue_free()
 
 
-func take_damage(dano: int, tipo: String = "", culpa: Personagem = null) -> void:
-	print("dano")
+func mostrarDano(dano: int) -> void:
+	var cor: Color = Color(255,200-(dano*15),0)
+	numeroFlutuante(cor,str(dano))
+
+func mostrarRecuperacao(vida) -> void:
+	var cor: Color = Color(0,255+(vida*15),0)
+	numeroFlutuante(cor,str(vida))
+
+
+func take_damage(dano: int, culpa: Personagem = null, tipo: String = "") -> void:
 	set_meta("Hp",get_meta("Hp") - dano)
 	mostrarDano(dano)
-	
+	ativo = true
 	if get_meta("Hp") < 1:
 		morrer()
 		if culpa:
-			culpa.matou.emit()
+			culpa.matou.emit(self)
 		
 	tomou_dano.emit()
 
+func recuperar_vida(vida: int, culpa: Entidade = null) -> void:
+	set_meta("Hp",get_meta("Hp") + vida)
+	mostrarRecuperacao(vida)
+	
+	if get_meta("Hp") > get_meta("MaxHp"):
+		set_meta("Hp", get_meta("MaxHp"))
+	
+	recuperou_vida.emit()
 
 func morrer() -> void:
 	game_manager.morte.emit(self)
@@ -209,7 +216,7 @@ func causarDano(alvo: Personagem) -> void:
 	
 	await mover(alvo.global_position, 40)
 	
-	alvo.take_damage(get_meta("Dano"))
+	alvo.take_damage(get_meta("Dano"), self)
 	causou_dano.emit()
 	
 	
@@ -217,40 +224,3 @@ func causarDano(alvo: Personagem) -> void:
 	
 	global_position = quadranteAtual.global_position
 	quadrante_do_alvo.mudarCor(Color(1,1,1,0.25))
-
-
-##✧✧✧  𝕌𝕋𝕀𝕃𝕊 ✧✧✧
-
-
-func configurarQuadrante() -> void:
-	for rastro in rastrosDeixados:
-		var rastronovo: Rastro = Rastro.new()
-		rastronovo.copiar(rastro)
-		
-		quadranteAtual.adicionar_rastro(rastronovo)
-		await get_tree().process_frame # -lag
-
-
-func calcularDistanciaDoMaiorRastro() -> void:
-	for rastro in rastrosDeixados:
-		if rastro_mais_longo == null:
-			rastro_mais_longo = rastro
-		if  rastro.calcularDistanciaDoRastro() >  rastro_mais_longo.calcularDistanciaDoRastro():
-			rastro_mais_longo = rastro
-	
-	distancia_do_maior_rastro = rastro_mais_longo.calcularDistanciaDoRastro()
-
-
-func set_quadrante() -> void:
-	var quadranteDesejado: Quadrante = null
-	for quadrante in $Area2D.get_overlapping_bodies():
-		if quadrante is Quadrante:
-			if not quadrante.ocupado:
-				if not quadranteDesejado:
-					quadranteDesejado = quadrante
-				elif global_position.distance_to(quadranteDesejado.global_position) > global_position.distance_to(quadrante.global_position):
-					quadranteDesejado = quadrante
-	
-	global_position = quadranteDesejado.global_position
-	quadranteDesejado.ocupar(self)
-	$Area2D.queue_free()

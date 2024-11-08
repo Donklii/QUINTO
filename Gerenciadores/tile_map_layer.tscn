@@ -9,7 +9,7 @@
 [ext_resource type="Texture2D" uid="uid://c2ml0wa2vdwgw" path="res://Tile_set/TX Tileset Grass.png" id="7_evclg"]
 [ext_resource type="Texture2D" uid="uid://biexaqm7is2av" path="res://Tile_set/TX Tileset Stone Ground.png" id="8_y2vsr"]
 [ext_resource type="Texture2D" uid="uid://ifw6f08sk51o" path="res://Tile_set/TX Tileset Wall.png" id="9_iji4s"]
-[ext_resource type="Script" path="res://tile_map_layer.gd" id="10_hc3um"]
+[ext_resource type="Script" path="res://Gerenciadores/tile_map_layer.gd" id="10_hc3um"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7oeb7"]
 texture = ExtResource("1_ykj11")

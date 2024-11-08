@@ -1,7 +1,7 @@
 [gd_scene load_steps=14 format=3 uid="uid://qp1u5wd1ci88"]
 
-[ext_resource type="Script" path="res://inimigo.gd" id="1_ncaqk"]
-[ext_resource type="Texture2D" uid="uid://66h38kce76sa" path="res://0x72_DungeonTilesetII_v1.7.png" id="2_pumit"]
+[ext_resource type="Script" path="res://Personagens/Inimigos/inimigo.gd" id="1_ncaqk"]
+[ext_resource type="Texture2D" uid="uid://66h38kce76sa" path="res://Imagens/0x72_DungeonTilesetII_v1.7.png" id="2_pumit"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ps73b"]
 size = Vector2(16, 16)

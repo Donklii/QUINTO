@@ -1,9 +1,11 @@
 extends TileMapLayer
 
-const QUADRANTE = preload("res://quadrante.tscn")
+const QUADRANTE = preload("res://Gerenciadores/quadrante.tscn")
 var tile_count:int = 0
 var andavel_count: int = 0
 var nao_andavel_count: int = 0
+
+const QUANDRANTES_POR_SETOR: int = 12
 
 var quadrante_matrix: Array[Array] = []
 
@@ -43,7 +45,29 @@ func adicionar_quadrantes() -> void:
 			
 			# Armazena o quadrante na matriz de quadrantes com o índice ajustado
 			quadrante_matrix[cell.x - min_x][cell.y - min_y] = quadranteNovo ## ChatGpt Gênio
+			
 			quadranteNovo.posicao = Vector2(cell.x - min_x,cell.y - min_y)
+			
+			quadranteNovo.setor = Vector2(int((cell.x - min_x)/QUANDRANTES_POR_SETOR),int((cell.y - min_y)/QUANDRANTES_POR_SETOR))
+			
+			if (cell.x - min_x)%QUANDRANTES_POR_SETOR == 0 or (cell.y - min_y)%QUANDRANTES_POR_SETOR == 0:
+				quadranteNovo.modulate = Color(0,255,0)
+			
+			for i in range(0,4):
+				var setordiferente: Vector2
+				match i:
+					0:
+						setordiferente = Vector2(int((cell.x - min_x)/QUANDRANTES_POR_SETOR),int((cell.y - min_y+3)/QUANDRANTES_POR_SETOR))
+					1:
+						setordiferente = Vector2(int((cell.x - min_x+3)/QUANDRANTES_POR_SETOR),int((cell.y - min_y)/QUANDRANTES_POR_SETOR))
+					2:
+						setordiferente = Vector2(int((cell.x - min_x-3)/QUANDRANTES_POR_SETOR),int((cell.y - min_y)/QUANDRANTES_POR_SETOR))
+					3:
+						setordiferente = Vector2(int((cell.x - min_x)/QUANDRANTES_POR_SETOR),int((cell.y - min_y-3)/QUANDRANTES_POR_SETOR))
+				
+				
+				if setordiferente != quadranteNovo.setor:
+					quadranteNovo.setoresAdjacentes.append(setordiferente)
 		else:
 			nao_andavel_count += 1
 			# Marca como nulo na matriz onde não há quadrante
@@ -61,8 +85,10 @@ func adicionar_quadrantes() -> void:
 func _ready() -> void:
 	await get_tree().process_frame
 	adicionar_quadrantes()
+	
 	print(tile_count)
 	print("Andavel: "+str(andavel_count))
 	print("Não andavel: "+str(nao_andavel_count))
+	
 	await get_tree().process_frame
 	get_parent().pronto.emit()

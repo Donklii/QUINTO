@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://byhkijxmr8h3x"]
 
-[ext_resource type="Script" path="res://rastros.gd" id="1_15ygc"]
+[ext_resource type="Script" path="res://Classes/rastros.gd" id="1_15ygc"]
 
 [node name="Rastros" type="Node"]
 script = ExtResource("1_15ygc")

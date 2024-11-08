@@ -1,6 +1,9 @@
 extends Personagem
 class_name Inimigo
 
+var xpDrop: int = 1
+
+
 func set_rastrosDeixados() -> void:
 	var rastronovo: Rastro = Rastro.new()
 	rastronovo.nome = "inimigo"

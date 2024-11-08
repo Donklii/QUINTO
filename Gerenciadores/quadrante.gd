@@ -6,9 +6,12 @@ var quadrante_matrix: Array[Array]
 
 var lista_de_rastros: Array[Rastro] = []
 
+var setor: Vector2
+var setoresAdjacentes: Array[Vector2]
 
 var ocupado: bool = false
 var donoAtual: Personagem = null
+var entidade: Entidade = null
 
 
 @onready var game_manager = $".."
@@ -22,7 +25,13 @@ func _process(_delta: float) -> void:
 
 ##➳➳➳ 𝐹𝑈𝑁𝐶̧𝑂̃𝐸𝑆 𝐵𝐴𝑆𝐸 ➳➳➳
 
-func ocupar(ocupante: Personagem) -> void:
+func ocupar(ocupante: Entidade) -> void:
+	if not ocupante is Personagem:
+		ocupante.quadranteAtual = self
+		entidade = ocupante
+		await ocupante.configurarQuadrante()
+		return
+	
 	ocupado = true
 	
 	if ocupante.quadranteAtual:
@@ -38,11 +47,16 @@ func ocupar(ocupante: Personagem) -> void:
 	await donoAtual.configurarQuadrante() # -lag
 
 
-func desocupar() -> void:
-	ocupado = false
+func desocupar(ocupante: Entidade = donoAtual) -> void:
 	
-	for rastroDeixado in donoAtual.rastrosDeixados:
+	for rastroDeixado in ocupante.rastrosDeixados:
 		apagar_restos_de_rastro(rastroDeixado)
+	
+	if not ocupante is Personagem:
+		entidade = null
+		return
+	
+	ocupado = false
 	
 	for i in range(4):
 		var quadrante_desejado: Quadrante = quadranteAoLado(i)
@@ -172,7 +186,7 @@ func cortar_rastros_bloqueaveis():
 				await get_tree().process_frame # -lag
 
 
-func remover_rastros_por_emissor(emissor: Personagem) -> void:
+func remover_rastros_por_emissor(emissor: Entidade) -> void:
 	
 	if lista_de_rastros.size() < 1:
 		return
@@ -225,12 +239,11 @@ func quadranteAoLado(indice: int) -> Quadrante:
 	var quadrante_proximo: Quadrante
 	match indice:
 			0:
-				if quadrante_matrix.size() > posicao.x:
+				if posicao.x+1 < quadrante_matrix.size():
 					quadrante_proximo = quadrante_matrix[posicao.x+1][posicao.y]
 			1:
-				if quadrante_matrix[posicao.x].size() > posicao.y:
+				if posicao.y+1 < quadrante_matrix[posicao.x].size():
 					quadrante_proximo = quadrante_matrix[posicao.x][posicao.y+1]
-				
 			2:
 				if posicao.x > 0:
 					quadrante_proximo = quadrante_matrix[posicao.x-1][posicao.y]
@@ -286,8 +299,11 @@ func mudarTransparencia(a: float) -> void:
 func _on_mouse_entered() -> void:
 	mudarCor(Color(0,0,1,1))
 	$Label.text = "Ocuapdo: " + str(ocupado)
-	for rastro in lista_de_rastros:
-		$Label.text += str(str("\n")+str("Rastro: ")+str(rastro.nome)+str(" Força: ")+str(rastro.forca))
+	$Label.text += "\nSetor: "+ str(setor)
+	for setorAd in setoresAdjacentes:
+		$Label.text += str("\n")+str("Adjacente: ")+str(setorAd)
+	#for rastro in lista_de_rastros:
+	#	$Label.text += str(str("\n")+str("Rastro: ")+str(rastro.nome)+str(" Força: ")+str(rastro.forca))
 	$Label.visible = true
 	
 
