@@ -37,9 +37,12 @@ func calcularDistanciaDoMaiorRastro() -> void:
 
 func set_quadrante() -> void:
 	var quadranteDesejado: Quadrante = null
-	for quadrante in $Area2D.get_overlapping_bodies():
+	
+	for quadrante in get_parent().get_children():
 		if quadrante is Quadrante:
-			if not quadrante.ocupado:
+			if (not quadrante.ocupado and 
+			quadrante.global_position.distance_to(global_position) < 100
+			):
 				if not quadranteDesejado:
 					quadranteDesejado = quadrante
 				elif global_position.distance_to(quadranteDesejado.global_position) > global_position.distance_to(quadrante.global_position):
@@ -47,4 +50,3 @@ func set_quadrante() -> void:
 	
 	global_position = quadranteDesejado.global_position
 	quadranteDesejado.ocupar(self)
-	$Area2D.queue_free()

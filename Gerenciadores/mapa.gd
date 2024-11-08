@@ -33,11 +33,14 @@ func _ready() -> void:
 
 func adicionarListaDeAcoes() -> void:
 	await get_tree().process_frame
+	if not is_instance_valid(protagonista):
+		return
 	for filho in get_children():
 		if filho is Personagem and not filho in lista_de_acao and is_instance_valid(filho):
 			if not filho.quadranteAtual or filho.get_meta("Hp") < 1:
 				await get_tree().process_frame
 				adicionarListaDeAcoes()
+				return
 			elif (filho.quadranteAtual.setor == protagonista.quadranteAtual.setor or
 			filho.ativo or
 			filho.quadranteAtual.setor in protagonista.quadranteAtual.setoresAdjacentes

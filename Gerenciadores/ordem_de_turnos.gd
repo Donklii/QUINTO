@@ -45,5 +45,3 @@ func fim_do_turno():
 		for child in $Imagens.get_children():
 			child.position.y -= 1
 		await get_tree().process_frame
-	
-	
