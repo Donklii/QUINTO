@@ -9,6 +9,8 @@ var MaxDeAcoes: int = 2
 var ativo: bool = false
 var pronto_para_fim_da_acao: bool = true
 
+var arvore_de_decisao: Selector
+
 signal recuperou_vida
 signal causou_dano
 signal tomou_dano
@@ -30,6 +32,15 @@ func _ready() -> void:
 	calcularDistanciaDoMaiorRastro()
 	
 	set_quadrante()
+	
+	arvore_de_decisao = criar_arvore_decisao()
+
+
+func _process(_delta: float) -> void:
+	if abs(velocity.x) > 10 or abs(velocity.y) >10:
+		$AnimatedSprite2D.play("default")
+	else:
+		$AnimatedSprite2D.play("idle")
 
 
 ## ⎯⎯⎯⎯⎯  𝌅 🌲 ÁRVORE DE DECISÃO 🌲 𝌅  ⎯⎯⎯⎯⎯
@@ -40,7 +51,7 @@ func agir(Acoes: int) -> void:
 	
 	game_manager.comeco_da_acao.emit()
 	
-	await decidirAcao()
+	await arvore_de_decisao.execute()
 	
 	while not pronto_para_fim_da_acao:
 		await get_tree().process_frame
@@ -61,20 +72,6 @@ func agir(Acoes: int) -> void:
 
 func finalizarTurno():
 	acabou_turno.emit()
-
-
-func decidirAcao() -> void:
-	var inimigoProximo: Personagem = detectarInimigos()
-	
-	if inimigoProximo:
-		await causarDano(inimigoProximo)
-		return
-	
-	var quadrantebusca: Quadrante = buscarQuadrante()
-	
-	if quadrantebusca:
-		await mover_ate_quadrante(quadrantebusca)
-		return
 
 
 func detectarInimigos() -> Personagem:
@@ -224,3 +221,60 @@ func causarDano(alvo: Personagem) -> void:
 	
 	global_position = quadranteAtual.global_position
 	quadrante_do_alvo.mudarCor(Color(1,1,1,0.25))
+
+
+
+func criar_arvore_decisao() -> Selector:
+	var root_selector = Selector.new()
+	
+	#--------------inimigo_sequence--------------
+	var inimigo_sequence = Sequence.new()
+	
+	var detectar_inimigo_condition = Condition.new()
+	detectar_inimigo_condition.set_function(self, "_detectar_inimigos")
+	inimigo_sequence.add_child(detectar_inimigo_condition)
+	
+	var causar_dano_action = Action.new()
+	causar_dano_action.set_function(self, "_causar_dano")
+	inimigo_sequence.add_child(causar_dano_action)
+	
+	
+	root_selector.add_child(inimigo_sequence)
+	
+	#--------------busca_sequence--------------
+	var busca_sequence = Sequence.new()
+	
+	var buscar_quadrante_condition = Condition.new()
+	buscar_quadrante_condition.set_function(self, "_buscar_quadrante")
+	busca_sequence.add_child(buscar_quadrante_condition)
+	
+	var mover_ate_quadrante_action = Action.new()
+	mover_ate_quadrante_action.set_function(self, "_mover_ate_quadrante")
+	busca_sequence.add_child(mover_ate_quadrante_action)
+	
+	
+	root_selector.add_child(busca_sequence)
+	
+	
+	return root_selector
+
+
+func _detectar_inimigos() -> bool:
+	return detectarInimigos() != null
+
+func _causar_dano() -> bool:
+	var inimigo_proximo: Personagem = detectarInimigos()
+	if inimigo_proximo:
+		await causarDano(inimigo_proximo)
+		return true
+	return false
+
+func _buscar_quadrante() -> bool:
+	return buscarQuadrante() != null
+
+func _mover_ate_quadrante() -> bool:
+	var quadrante_busca: Quadrante = buscarQuadrante()
+	if quadrante_busca:
+		await mover_ate_quadrante(quadrante_busca)
+		return true
+	return false

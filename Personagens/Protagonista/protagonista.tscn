@@ -7,14 +7,6 @@
 [ext_resource type="Texture2D" uid="uid://cmjqoj1gpu2ov" path="res://Ups/HP.png" id="4_3e5dt"]
 [ext_resource type="Texture2D" uid="uid://bgje0ssoxwc35" path="res://Ups/SPEED.png" id="5_y2tqg"]
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_skxg8"]
-atlas = ExtResource("2_qgx83")
-region = Rect2(128, 32, 16, 32)
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_2l0jk"]
-atlas = ExtResource("2_qgx83")
-region = Rect2(144, 32, 16, 32)
-
 [sub_resource type="AtlasTexture" id="AtlasTexture_1ye8k"]
 atlas = ExtResource("2_qgx83")
 region = Rect2(176, 32, 16, 32)
@@ -39,19 +31,16 @@ region = Rect2(240, 32, 16, 32)
 atlas = ExtResource("2_qgx83")
 region = Rect2(160, 32, 16, 32)
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_skxg8"]
+atlas = ExtResource("2_qgx83")
+region = Rect2(128, 32, 16, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_2l0jk"]
+atlas = ExtResource("2_qgx83")
+region = Rect2(144, 32, 16, 32)
+
 [sub_resource type="SpriteFrames" id="SpriteFrames_hajwu"]
 animations = [{
-"frames": [{
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_skxg8")
-}, {
-"duration": 1.0,
-"texture": SubResource("AtlasTexture_2l0jk")
-}],
-"loop": true,
-"name": &"Idle",
-"speed": 1.0
-}, {
 "frames": [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_1ye8k")
@@ -79,6 +68,17 @@ animations = [{
 "loop": false,
 "name": &"desvio",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_skxg8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_2l0jk")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 1.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_y2c1j"]
@@ -95,12 +95,12 @@ metadata/Dano = 1
 texture_filter = 1
 position = Vector2(0, -9)
 sprite_frames = SubResource("SpriteFrames_hajwu")
-animation = &"desvio"
+animation = &"idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-visible = false
 position = Vector2(0, -1)
 shape = SubResource("RectangleShape2D_y2c1j")
+disabled = true
 
 [node name="Ups" type="CanvasLayer" parent="."]
 visible = false

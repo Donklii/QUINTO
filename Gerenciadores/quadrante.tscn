@@ -30,7 +30,6 @@ sprite_frames = SubResource("SpriteFrames_4fyf3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_t1w7g")
-disabled = true
 
 [node name="Label" type="Label" parent="."]
 texture_filter = 1

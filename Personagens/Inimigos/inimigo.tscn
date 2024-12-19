@@ -68,6 +68,14 @@ animations = [{
 "loop": true,
 "name": &"default",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_udwjs")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
 }]
 
 [node name="Inimigo" type="CharacterBody2D"]
@@ -79,9 +87,10 @@ metadata/MaxHp = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_ps73b")
+disabled = true
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 sprite_frames = SubResource("SpriteFrames_3jfrq")
-frame_progress = 0.268854
+animation = &"idle"
 
 [connection signal="acabou_acao" from="." to="." method="_on_acabou_acao"]

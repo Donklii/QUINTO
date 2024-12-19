@@ -2277,7 +2277,7 @@ zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 
 [node name="Protagonista" parent="." instance=ExtResource("3_ci34q")]
-position = Vector2(311, -187)
+position = Vector2(250, -93)
 
 [node name="Inimigo" parent="." instance=ExtResource("4_rfj0g")]
 position = Vector2(373, 91)

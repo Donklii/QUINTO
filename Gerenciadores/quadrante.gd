@@ -76,22 +76,22 @@ func desocupar(ocupante: Entidade = donoAtual) -> void:
 func adicionar_rastro(rastroNovo:Rastro) -> void:
 	if ocupado:
 		if !rastroNovo.passa_por_personagem and rastroNovo.emissor != donoAtual:
-			rastroNovo.queue_free()
+			rastroNovo.free()
 			return
 	
 	for rastroatual in lista_de_rastros:
 		if rastroatual.equals(rastroNovo):
-			rastroNovo.queue_free()
+			rastroNovo.free()
 			return
 			
 		elif rastroatual.nome == rastroNovo.nome and rastroatual.emissor == rastroNovo.emissor:
 			
 			if  rastroatual.forca >= rastroNovo.forca:
-				rastroNovo.queue_free()
+				rastroNovo.free()
 				return
 			else:
 				rastroatual.forca = rastroNovo.forca
-				rastroNovo.queue_free()
+				rastroNovo.free()
 				espalhar_rastro(rastroatual)
 				return
 	
@@ -177,12 +177,11 @@ func cortar_rastros_bloqueaveis():
 	if ocupado:
 		for rastro in lista_de_rastros:
 			if !rastro.passa_por_personagem and rastro.emissor != donoAtual:
-				
+				var emissor: Entidade = rastro.emissor
 				apagar_restos_de_rastro(rastro)
 				
-				rastro.emissor.quadranteAtual.espalhar_rastros_bloqueaveis()
+				emissor.quadranteAtual.espalhar_rastros_bloqueaveis()
 				
-				apagar_rastro(rastro)
 				await get_tree().process_frame # -lag
 
 
@@ -226,7 +225,7 @@ func remover_todos_os_rastros() -> void:
 
 func apagar_rastro(rastro: Rastro) -> void:
 	lista_de_rastros.erase(rastro)
-	rastro.queue_free()
+	rastro.free()
 
 
 
@@ -302,8 +301,8 @@ func _on_mouse_entered() -> void:
 	$Label.text += "\nSetor: "+ str(setor)
 	for setorAd in setoresAdjacentes:
 		$Label.text += str("\n")+str("Adjacente: ")+str(setorAd)
-	#for rastro in lista_de_rastros:
-	#	$Label.text += str(str("\n")+str("Rastro: ")+str(rastro.nome)+str(" Força: ")+str(rastro.forca))
+	for rastro in lista_de_rastros:
+		$Label.text += str(str("\n")+str("Rastro: ")+str(rastro.nome)+str(" Força: ")+str(rastro.forca))
 	$Label.visible = true
 	
 
