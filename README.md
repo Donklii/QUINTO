@@ -14,4 +14,4 @@ se encontrar do seu lado, inimigos ativos são adicionados na ordem de turnos pa
   O protagonista assim como os inimigos utilizam um sistema de detecção de rastros para a movimentação, indo atrás do mais relevante no momento de acordo com suas maquinas de estado e se guiando pela
 informação mais forte desse rastro para encontrar aonde ele quer chegar, os inimigos só tem interesse em caçar o Protagonista e o Protagonista pode ir atrás de inimigos ou Vida caso com a vida Baixa.
 
-As máquinas de estado do protagonista e Inimigos estão detalhadas em StateMachine.jpg nos arquivos principais.
+As máquinas de estado do protagonista e Inimigos estão detalhadas em StateMachine.jpeg nos arquivos principais.
