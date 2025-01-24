@@ -6,6 +6,8 @@ var rastrosDesejados: Array[String] = []
 
 var turnoAtual: bool = false
 var MaxDeAcoes: int = 2
+var acoesRestantes: int = 0
+
 var ativo: bool = false
 var pronto_para_fim_da_acao: bool = true
 
@@ -49,6 +51,8 @@ func _process(_delta: float) -> void:
 func agir(Acoes: int) -> void:
 	turnoAtual = true
 	
+	acoesRestantes = Acoes
+	
 	game_manager.comeco_da_acao.emit()
 	
 	await arvore_de_decisao.execute()
@@ -68,13 +72,15 @@ func agir(Acoes: int) -> void:
 		agir(MaxDeAcoes)
 	else:
 		finalizarTurno()
+		acoesRestantes = 0
 
 
 func finalizarTurno():
 	acabou_turno.emit()
 
 
-func detectarInimigos() -> Personagem:
+func detectarInimigos() -> Array[Personagem]:
+	var lista: Array[Personagem] = []
 	for i in range(0,4):
 		var quadrante_proximo: Quadrante = quadranteAtual.quadranteAoLado(i)
 		
@@ -82,11 +88,11 @@ func detectarInimigos() -> Personagem:
 			if quadrante_proximo.ocupado and quadrante_proximo.donoAtual:
 				if self is Inimigo:
 					if quadrante_proximo.donoAtual is Protagonista:
-						return quadrante_proximo.donoAtual
+						lista.append(quadrante_proximo.donoAtual)
 				elif self is Protagonista:
 					if quadrante_proximo.donoAtual is Inimigo:
-						return quadrante_proximo.donoAtual
-	return null
+						lista.append(quadrante_proximo.donoAtual)
+	return lista
 
 
 func buscarQuadrante() -> Quadrante:
@@ -113,6 +119,79 @@ func buscarQuadrante() -> Quadrante:
 
 ##⇀ ⇀ ⇀ ⇀ ⇀ ➤ M O V I M E N T A Ç Ã O ➤ ⇀ ⇀ ⇀ ⇀ ⇀
 
+func melhor_proximo_passo(quadrantes: Array, objetivo: Object) -> Quadrante:
+	var inicio: Quadrante = self.quadranteAtual
+	var destino: Quadrante = objetivo.quadranteAtual
+	print("posição inimiga: " + str(destino.posicao))
+	
+	if not destino:
+		print("Erro: Quadrante inicial ou destino inválido.")
+		return null
+	
+	var lista_aberta: Array = []
+	var lista_fechada: Array = []
+	
+	var custo_g = {}
+	var custo_f = {}
+	var caminhos = {}
+	
+	lista_aberta.append(inicio)
+	custo_g[inicio] = 0
+	custo_f[inicio] = heuristica(inicio, destino)
+	
+	while lista_aberta.size() > 0:
+		# Encontra o quadrante com menor custo f na lista aberta
+		var atual = lista_aberta[0]
+		for quadrante in lista_aberta:
+			if custo_f.has(quadrante) and custo_f[quadrante] < custo_f[atual]:
+				atual = quadrante
+	
+		# Verifica se alcançou o destino
+		if atual == destino or (
+			(objetivo is Personagem or objetivo is Fantasma) and 
+			(atual == quadrantes[destino.posicao.x][destino.posicao.y-1] or
+			atual == quadrantes[destino.posicao.x][destino.posicao.y+1] or
+			atual == quadrantes[destino.posicao.x-1][destino.posicao.y] or 
+			atual == quadrantes[destino.posicao.x+1][destino.posicao.y])
+		):
+			print("Objetivo encontrado!")
+			return reconstruir_caminho(caminhos, atual)
+		
+		lista_aberta.erase(atual)
+		lista_fechada.append(atual)
+		
+		# Adiciona os vizinhos à lista aberta
+		for i in range(4):
+			var vizinho = atual.quadranteAoLado(i)
+			if vizinho and not vizinho.ocupado and not lista_fechada.has(vizinho):
+				var novo_custo_g = custo_g[atual] + 1
+				if not lista_aberta.has(vizinho):
+					lista_aberta.append(vizinho)
+					caminhos[vizinho] = atual
+				elif novo_custo_g >= custo_g.get(vizinho, INF):
+					continue
+				
+				# Atualiza os custos do vizinho
+				custo_g[vizinho] = novo_custo_g
+				custo_f[vizinho] = custo_g[vizinho] + heuristica(vizinho, destino)
+	
+	print("Nenhum caminho disponível para o objetivo.")
+	return null
+
+
+func heuristica(atual: Quadrante, destino: Quadrante) -> float:
+	return abs(atual.posicao.x - destino.posicao.x) + abs(atual.posicao.y - destino.posicao.y)
+
+
+func reconstruir_caminho(caminhos: Dictionary, atual: Quadrante) -> Quadrante:
+	var caminho = []
+	while atual in caminhos:
+		caminho.append(atual)
+		atual = caminhos[atual]
+	caminho.reverse()
+	return caminho[0] if caminho.size() > 0 else null
+
+
 func mover(alvo: Vector2, velocidade: int, proximidade: float = 4) -> void:
 	
 	while (alvo.distance_to(global_position) > proximidade):
@@ -128,6 +207,10 @@ func mover(alvo: Vector2, velocidade: int, proximidade: float = 4) -> void:
 
 
 func mover_ate_quadrante(quadrantebusca: Quadrante) -> void:
+	
+	if !quadrantebusca:
+		print("Quadrante invalido")
+		return
 	
 	quadrantebusca.mudarCor(Color(0,1,0,1))
 	
@@ -145,15 +228,9 @@ func mover_ate_quadrante(quadrantebusca: Quadrante) -> void:
 
 
 ##✹✹✹✹✹✹✹✹✹✹✹✹✹  C ⊛ M B A T E ✹✹✹✹✹✹✹✹✹✹✹✹✹
-
-func numeroFlutuante(cor: Color, mensagem: String = "") -> void:
-	var numeroFlutuante = Label.new()
-	numeroFlutuante.text = mensagem
-	
-	numeroFlutuante.self_modulate = cor
-	
-	add_child(numeroFlutuante)
-	numeroFlutuante.global_position = get_node("AnimatedSprite2D").global_position + Vector2(0,-20)
+func subir(objeto: Object):
+	add_child(objeto)
+	objeto.global_position = get_node("AnimatedSprite2D").global_position + Vector2(0,-20)
 	
 	var tempo: float = 5
 	var velocidade: Vector2 = Vector2(0,-randi_range(20,40))
@@ -161,11 +238,19 @@ func numeroFlutuante(cor: Color, mensagem: String = "") -> void:
 	while tempo > 0:
 		tempo -= get_process_delta_time()
 		
-		numeroFlutuante.modulate.a -= 0.02
-		numeroFlutuante.global_position += velocidade * get_process_delta_time()
+		objeto.modulate.a -= 0.02
+		objeto.global_position += velocidade * get_process_delta_time()
 		await get_tree().process_frame
 	
-	numeroFlutuante.queue_free()
+	objeto.queue_free()
+
+func numeroFlutuante(cor: Color, mensagem: String = "") -> void:
+	var numeroFlutuante = Label.new()
+	numeroFlutuante.text = mensagem
+	
+	numeroFlutuante.self_modulate = cor
+	
+	subir(numeroFlutuante)
 
 
 func mostrarDano(dano: int) -> void:
@@ -260,10 +345,10 @@ func criar_arvore_decisao() -> Selector:
 
 
 func _detectar_inimigos() -> bool:
-	return detectarInimigos() != null
+	return !detectarInimigos().is_empty()
 
 func _causar_dano() -> bool:
-	var inimigo_proximo: Personagem = detectarInimigos()
+	var inimigo_proximo: Personagem = detectarInimigos()[0]
 	if inimigo_proximo:
 		await causarDano(inimigo_proximo)
 		return true
@@ -278,3 +363,11 @@ func _mover_ate_quadrante() -> bool:
 		await mover_ate_quadrante(quadrante_busca)
 		return true
 	return false
+
+
+
+func copiar(inspiracao: Personagem):
+	turnoAtual = inspiracao.turnoAtual
+	MaxDeAcoes = inspiracao.MaxDeAcoes
+	ativo = inspiracao.ativo
+	pronto_para_fim_da_acao = inspiracao.pronto_para_fim_da_acao

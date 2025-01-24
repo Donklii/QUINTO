@@ -12,7 +12,7 @@ var setoresAdjacentes: Array[Vector2]
 var ocupado: bool = false
 var donoAtual: Personagem = null
 var entidade: Entidade = null
-
+var fantasmas: Array[OcupacaoFantasma] = []
 
 @onready var game_manager = $".."
 
@@ -66,8 +66,6 @@ func desocupar(ocupante: Entidade = donoAtual) -> void:
 			await get_tree().process_frame # -lag
 	
 	donoAtual = null
-
-
 
 ##➳➳➳ 𝗔𝗗𝗜𝗖𝗜𝗢𝗡𝗔𝗥 𝗥𝗔𝗦𝗧𝗥𝗢𝗦 ➳➳➳
 
@@ -238,8 +236,8 @@ func quadranteAoLado(indice: int) -> Quadrante:
 	var quadrante_proximo: Quadrante
 	match indice:
 			0:
-				if posicao.x+1 < quadrante_matrix.size():
-					quadrante_proximo = quadrante_matrix[posicao.x+1][posicao.y]
+				if posicao.y > 0:
+					quadrante_proximo = quadrante_matrix[posicao.x][posicao.y-1]
 			1:
 				if posicao.y+1 < quadrante_matrix[posicao.x].size():
 					quadrante_proximo = quadrante_matrix[posicao.x][posicao.y+1]
@@ -247,8 +245,8 @@ func quadranteAoLado(indice: int) -> Quadrante:
 				if posicao.x > 0:
 					quadrante_proximo = quadrante_matrix[posicao.x-1][posicao.y]
 			3:
-				if posicao.y > 0:
-					quadrante_proximo = quadrante_matrix[posicao.x][posicao.y-1]
+				if posicao.x+1 < quadrante_matrix.size():
+					quadrante_proximo = quadrante_matrix[posicao.x+1][posicao.y]
 	
 	return quadrante_proximo
 
@@ -299,10 +297,11 @@ func _on_mouse_entered() -> void:
 	mudarCor(Color(0,0,1,1))
 	$Label.text = "Ocuapdo: " + str(ocupado)
 	$Label.text += "\nSetor: "+ str(setor)
-	for setorAd in setoresAdjacentes:
-		$Label.text += str("\n")+str("Adjacente: ")+str(setorAd)
-	for rastro in lista_de_rastros:
-		$Label.text += str(str("\n")+str("Rastro: ")+str(rastro.nome)+str(" Força: ")+str(rastro.forca))
+	for fantasma: OcupacaoFantasma in fantasmas:
+		var nome:String 
+		if fantasma.ocupante is PhantomProtagonista: nome = "Protagonista"
+		else: nome = "Inimigo"
+		$Label.text += str(str("\n")+str("Fan: ")+str(nome.substr(0,nome.length()/4))+str(" Ger: ")+str(fantasma.geracao))
 	$Label.visible = true
 	
 

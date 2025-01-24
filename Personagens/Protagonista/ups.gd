@@ -21,7 +21,7 @@ func _on_button_pressed(escolha: String) -> void:
 				print("mov")
 				$"..".MaxDeAcoes += 1
 			"hp":
-				$"..".set_meta("MaxHp", $"..".get_meta("MaxHp")+1)
+				$"..".set_meta("MaxHp", $"..".get_meta("MaxHp")+2)
 			"dmg":
 				$"..".set_meta("Dano", $"..".get_meta("Dano")+1)
 	visible = false

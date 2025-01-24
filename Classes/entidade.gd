@@ -7,7 +7,7 @@ var distancia_do_maior_rastro: int = 0
 
 var quadranteAtual: Quadrante = null
 
-@onready var game_manager: Node = $".."
+@onready var game_manager: GameManager = $".."
 
 
 

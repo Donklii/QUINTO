@@ -1,0 +1,94 @@
+[gd_scene load_steps=13 format=3 uid="uid://6ejjxyyyc5ef"]
+
+[ext_resource type="Script" path="res://Personagens/Inimigos/super_inimigo.gd" id="1_ium4c"]
+[ext_resource type="Texture2D" uid="uid://66h38kce76sa" path="res://Imagens/0x72_DungeonTilesetII_v1.7.png" id="2_iwuuf"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_55wg6"]
+size = Vector2(16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_udwjs"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(368, 256, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_chg1n"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(384, 256, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_h0o24"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(400, 256, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sii8x"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(416, 256, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xtmst"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(432, 256, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_efuti"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(448, 256, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rosgx"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(464, 256, 16, 16)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_i5nqu"]
+atlas = ExtResource("2_iwuuf")
+region = Rect2(480, 256, 16, 16)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_s3xug"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_udwjs")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_chg1n")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_h0o24")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sii8x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xtmst")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_efuti")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rosgx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_i5nqu")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_udwjs")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="SuperInimigo" type="CharacterBody2D"]
+script = ExtResource("1_ium4c")
+metadata/Hp = 8
+metadata/Dano = 2
+metadata/MaxHp = 6
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_55wg6")
+disabled = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+modulate = Color(0, 0.933333, 0, 1)
+sprite_frames = SubResource("SpriteFrames_s3xug")
+animation = &"idle"

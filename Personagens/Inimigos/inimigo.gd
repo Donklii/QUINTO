@@ -2,7 +2,8 @@ extends Personagem
 class_name Inimigo
 
 var xpDrop: int = 1
-
+var valorDoDano: int = 1
+var valorDaVida: int = 4
 
 func set_rastrosDeixados() -> void:
 	var rastronovo: Rastro = Rastro.new()
@@ -20,3 +21,7 @@ func set_rastrosDesejados() -> void:
 
 func _on_acabou_acao() -> void:
 	pass
+
+func copiar(inspiracao: Personagem):
+	super.copiar(inspiracao)
+	xpDrop = inspiracao.xpDrop

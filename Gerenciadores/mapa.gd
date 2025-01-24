@@ -1,4 +1,5 @@
 extends Node
+class_name GameManager
 
 var protagonista: Protagonista
 var lista_de_acao: Array[Personagem] = []

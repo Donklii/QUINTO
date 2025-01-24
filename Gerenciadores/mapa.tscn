@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=4 uid="uid://6uiyn3lmgpdp"]
+[gd_scene load_steps=29 format=4 uid="uid://6uiyn3lmgpdp"]
 
 [ext_resource type="Script" path="res://Gerenciadores/mapa.gd" id="1_0llrb"]
 [ext_resource type="PackedScene" uid="uid://cfh71w0xss0qq" path="res://Gerenciadores/tile_map_layer.tscn" id="1_7x5sd"]
@@ -16,6 +16,7 @@
 [ext_resource type="Texture2D" uid="uid://biexaqm7is2av" path="res://Tile_set/TX Tileset Stone Ground.png" id="10_7i5ei"]
 [ext_resource type="Texture2D" uid="uid://ifw6f08sk51o" path="res://Tile_set/TX Tileset Wall.png" id="11_3mi28"]
 [ext_resource type="PackedScene" uid="uid://cumb1umj7aj87" path="res://Itens/VidaDrop/vida.tscn" id="16_pxj25"]
+[ext_resource type="PackedScene" uid="uid://6ejjxyyyc5ef" path="res://Personagens/Inimigos/super_inimigo.tscn" id="17_x66vn"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_7oeb7"]
 texture = ExtResource("3_tx4xq")
@@ -2277,7 +2278,7 @@ zoom = Vector2(2, 2)
 position_smoothing_enabled = true
 
 [node name="Protagonista" parent="." instance=ExtResource("3_ci34q")]
-position = Vector2(250, -93)
+position = Vector2(-2, -7)
 
 [node name="Inimigo" parent="." instance=ExtResource("4_rfj0g")]
 position = Vector2(373, 91)
@@ -2298,11 +2299,14 @@ offset_right = 86.0
 offset_bottom = 32.0
 text = "aaaaa"
 
+[node name="Inimigo8" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(231, 29)
+
 [node name="Inimigo3" parent="." instance=ExtResource("4_rfj0g")]
 position = Vector2(45, 290)
 
 [node name="Inimigo4" parent="." instance=ExtResource("4_rfj0g")]
-position = Vector2(197, -77)
+position = Vector2(36, -46)
 
 [node name="Inimigo5" parent="." instance=ExtResource("4_rfj0g")]
 position = Vector2(-248, -7)
@@ -2321,6 +2325,66 @@ position = Vector2(-6, 178)
 
 [node name="Vida3" parent="." instance=ExtResource("16_pxj25")]
 position = Vector2(-101, -167)
+
+[node name="Inimigo9" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-59, 132)
+
+[node name="Inimigo10" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(263, -139)
+
+[node name="Inimigo11" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-84, -182)
+
+[node name="Inimigo12" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(260, 148)
+
+[node name="Inimigo13" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(332, -27)
+
+[node name="Inimigo14" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-99, 76)
+
+[node name="Inimigo15" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(3, 96)
+
+[node name="Inimigo16" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-70, -73)
+
+[node name="Inimigo17" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(162, 10)
+
+[node name="Inimigo18" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(107, -57)
+
+[node name="Inimigo19" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(192, 81)
+
+[node name="Inimigo20" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-239, 184)
+
+[node name="Inimigo21" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-137, 204)
+
+[node name="Inimigo22" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-210, 35)
+
+[node name="Inimigo23" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(22, 118)
+
+[node name="Inimigo24" parent="." instance=ExtResource("4_rfj0g")]
+position = Vector2(-33, 51)
+
+[node name="SuperInimigo" parent="." instance=ExtResource("17_x66vn")]
+position = Vector2(109, 145)
+
+[node name="SuperInimigo2" parent="." instance=ExtResource("17_x66vn")]
+position = Vector2(62, -107)
+
+[node name="SuperInimigo3" parent="." instance=ExtResource("17_x66vn")]
+position = Vector2(-137, -117)
+
+[node name="SuperInimigo4" parent="." instance=ExtResource("17_x66vn")]
+position = Vector2(335, 158)
 
 [connection signal="comeco_da_acao" from="." to="." method="_on_comeco_da_acao"]
 [connection signal="comeco_do_turno" from="." to="." method="_on_comeco_do_turno"]
